@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather & Air Quality Checker</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
     <style>
@@ -74,7 +75,7 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
             color: var(--primary-color);
         }
 
@@ -92,12 +93,14 @@
 
         .search-container {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 20px;
         }
 
         #location-input {
             flex: 1;
+            min-width: 200px;
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -119,6 +122,7 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.2s;
+            white-space: nowrap;
         }
 
         button:hover {
@@ -205,6 +209,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .tabs {
@@ -217,6 +223,7 @@
             background-color: #eee;
             border-radius: 5px;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         body.dark-mode .tab {
@@ -231,6 +238,7 @@
         .chart-container {
             height: 300px;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .hourly-forecast {
@@ -238,6 +246,21 @@
             overflow-x: auto;
             gap: 15px;
             padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+
+        .hourly-forecast::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .hourly-forecast::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .hourly-forecast::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 20px;
         }
 
         .hour-card {
@@ -247,6 +270,7 @@
             background-color: var(--card-color);
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
 
         body.dark-mode .hour-card {
@@ -277,6 +301,9 @@
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
         }
 
         body.dark-mode .health-alert {
@@ -315,6 +342,7 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+            white-space: nowrap;
         }
 
         body.dark-mode .city-chip {
@@ -390,7 +418,151 @@
             justify-content: center;
         }
 
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .notification.success {
+            background-color: var(--secondary-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        .map-container {
+            height: 300px;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .unit-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .unit-toggle span {
+            font-weight: bold;
+        }
+
+        .unit-btn {
+            padding: 5px 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        body.dark-mode .unit-btn {
+            background-color: #333;
+        }
+
+        .unit-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .pollen-info {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .pollen-item {
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .pollen-value {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .pollen-low {
+            color: var(--secondary-color);
+        }
+
+        .pollen-moderate {
+            color: var(--warning-color);
+        }
+
+        .pollen-high {
+            color: var(--danger-color);
+        }
+
+        .air-pollutants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .pollutant-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .pollutant-value {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
             .current-weather {
                 grid-template-columns: 1fr;
             }
@@ -401,6 +573,52 @@
             
             .daily-forecast {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .additional-info {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container button {
+                flex: 1;
+                min-width: calc(50% - 5px);
+            }
+
+            .forecast-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tabs {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .tab {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .daily-forecast {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container button {
+                min-width: 100%;
+            }
+
+            .temperature {
+                font-size: 2.5rem;
+            }
+
+            .chart-container {
+                height: 250px;
             }
         }
 
@@ -435,6 +653,8 @@
     </style>
 </head>
 <body class="weather-bg-clear">
+    <div class="notification" id="notification"></div>
+    
     <div class="container">
         <header>
             <h1 id="app-title">Weather & Air Quality Checker</h1>
@@ -445,14 +665,19 @@
 
         <div class="search-container">
             <input type="text" id="location-input" placeholder="Enter city name or zip code">
-            <button id="search-btn"><i class="fas fa-search"></i> Search</button>
-            <button id="locate-btn"><i class="fas fa-location-arrow"></i> Current Location</button>
+            <button id="search-btn"><i class="fas fa-search"></i> <span id="search-text">Search</span></button>
+            <button id="locate-btn"><i class="fas fa-location-arrow"></i> <span id="locate-text">Current Location</span></button>
         </div>
 
         <div id="health-alerts"></div>
 
         <div class="current-weather">
             <div class="weather-card">
+                <div class="unit-toggle">
+                    <span id="unit-text">Units:</span>
+                    <div class="unit-btn active" data-unit="metric">°C, km/h</div>
+                    <div class="unit-btn" data-unit="imperial">°F, mph</div>
+                </div>
                 <div class="main-info">
                     <div class="weather-icon" id="weather-icon">
                         <i class="fas fa-sun"></i>
@@ -461,34 +686,35 @@
                         <div class="temperature" id="temperature">--°C</div>
                         <div id="weather-description">--</div>
                         <div id="location">--</div>
+                        <div id="feels-like">Feels like: --°</div>
                     </div>
                 </div>
                 <div class="weather-details">
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-tint"></i></div>
                         <div>
-                            <div>Humidity</div>
+                            <div id="humidity-label">Humidity</div>
                             <div id="humidity">--%</div>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-wind"></i></div>
                         <div>
-                            <div>Wind</div>
+                            <div id="wind-label">Wind</div>
                             <div id="wind">-- km/h</div>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-compass"></i></div>
                         <div>
-                            <div>Wind Direction</div>
+                            <div id="wind-direction-label">Wind Direction</div>
                             <div id="wind-direction">--</div>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-cloud-rain"></i></div>
                         <div>
-                            <div>Precipitation</div>
+                            <div id="precipitation-label">Precipitation</div>
                             <div id="precipitation">--%</div>
                         </div>
                     </div>
@@ -496,46 +722,65 @@
             </div>
 
             <div class="weather-card">
-                <h2>Air Quality</h2>
+                <h2 id="air-quality-title">Air Quality</h2>
                 <div class="weather-details">
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-lungs"></i></div>
                         <div>
-                            <div>Air Quality Index</div>
+                            <div id="aqi-label">Air Quality Index</div>
                             <div id="aqi">-- <span class="aqi-indicator aqi-good">Good</span></div>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-sun"></i></div>
                         <div>
-                            <div>UV Index</div>
+                            <div id="uv-label">UV Index</div>
                             <div id="uv-index">--</div>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-eye"></i></div>
                         <div>
-                            <div>Visibility</div>
+                            <div id="visibility-label">Visibility</div>
                             <div id="visibility">-- km</div>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-icon"><i class="fas fa-clock"></i></div>
                         <div>
-                            <div>Sunrise/Sunset</div>
+                            <div id="sun-times-label">Sunrise/Sunset</div>
                             <div id="sun-times">--:-- / --:--</div>
                         </div>
                     </div>
                 </div>
+                
+                <div class="pollen-info" id="pollen-info" style="display: none;">
+                    <div class="pollen-item">
+                        <div><i class="fas fa-tree"></i> Tree Pollen</div>
+                        <div class="pollen-value pollen-low">Low</div>
+                    </div>
+                    <div class="pollen-item">
+                        <div><i class="fas fa-seedling"></i> Grass Pollen</div>
+                        <div class="pollen-value pollen-moderate">Moderate</div>
+                    </div>
+                    <div class="pollen-item">
+                        <div><i class="fas fa-leaf"></i> Weed Pollen</div>
+                        <div class="pollen-value pollen-high">High</div>
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div class="map-container" id="map-container" style="display: none;">
+            <iframe id="map-iframe" frameborder="0" allowfullscreen></iframe>
         </div>
 
         <div class="forecast-container">
             <div class="forecast-header">
                 <h2 id="forecast-title">Hourly Forecast</h2>
                 <div class="tabs">
-                    <div class="tab active" data-tab="hourly">Hourly</div>
-                    <div class="tab" data-tab="daily">Daily</div>
+                    <div class="tab active" data-tab="hourly" id="hourly-tab">Hourly</div>
+                    <div class="tab" data-tab="daily" id="daily-tab">Daily</div>
                 </div>
             </div>
 
@@ -553,7 +798,7 @@
         </div>
 
         <div class="saved-cities-container">
-            <h2>Saved Locations</h2>
+            <h2 id="saved-locations-title">Saved Locations</h2>
             <div class="saved-cities" id="saved-cities">
                 <!-- Saved cities will be added here -->
             </div>
@@ -561,19 +806,19 @@
 
         <div class="additional-info">
             <div class="info-card">
-                <h3>Health Recommendations</h3>
+                <h3 id="health-title">Health Recommendations</h3>
                 <div id="health-recommendations">
                     <p>Air quality is good. No special precautions needed.</p>
                 </div>
             </div>
             <div class="info-card">
-                <h3>Skin Care Tips</h3>
+                <h3 id="skin-title">Skin Care Tips</h3>
                 <div id="skin-care-tips">
                     <p>UV index is moderate. Consider wearing sunscreen.</p>
                 </div>
             </div>
             <div class="info-card">
-                <h3>Mood Suggestions</h3>
+                <h3 id="mood-title">Mood Suggestions</h3>
                 <div id="mood-suggestions">
                     <p>It's a beautiful day! Great for outdoor activities.</p>
                 </div>
@@ -597,6 +842,8 @@
         let isEnglish = true;
         let deferredPrompt;
         let weatherChart = null;
+        let currentUnit = 'metric';
+        let isLoading = false;
 
         // DOM elements
         const elements = {
@@ -606,6 +853,7 @@
             temperature: document.getElementById('temperature'),
             weatherDescription: document.getElementById('weather-description'),
             location: document.getElementById('location'),
+            feelsLike: document.getElementById('feels-like'),
             humidity: document.getElementById('humidity'),
             wind: document.getElementById('wind'),
             windDirection: document.getElementById('wind-direction'),
@@ -628,7 +876,30 @@
             appTitle: document.getElementById('app-title'),
             forecastTitle: document.getElementById('forecast-title'),
             installBtn: document.getElementById('install-btn'),
-            body: document.body
+            body: document.body,
+            notification: document.getElementById('notification'),
+            mapContainer: document.getElementById('map-container'),
+            mapIframe: document.getElementById('map-iframe'),
+            pollenInfo: document.getElementById('pollen-info'),
+            unitButtons: document.querySelectorAll('.unit-btn'),
+            searchText: document.getElementById('search-text'),
+            locateText: document.getElementById('locate-text'),
+            unitText: document.getElementById('unit-text'),
+            humidityLabel: document.getElementById('humidity-label'),
+            windLabel: document.getElementById('wind-label'),
+            windDirectionLabel: document.getElementById('wind-direction-label'),
+            precipitationLabel: document.getElementById('precipitation-label'),
+            aqiLabel: document.getElementById('aqi-label'),
+            uvLabel: document.getElementById('uv-label'),
+            visibilityLabel: document.getElementById('visibility-label'),
+            sunTimesLabel: document.getElementById('sun-times-label'),
+            airQualityTitle: document.getElementById('air-quality-title'),
+            savedLocationsTitle: document.getElementById('saved-locations-title'),
+            healthTitle: document.getElementById('health-title'),
+            skinTitle: document.getElementById('skin-title'),
+            moodTitle: document.getElementById('mood-title'),
+            hourlyTab: document.getElementById('hourly-tab'),
+            dailyTab: document.getElementById('daily-tab')
         };
 
         // Event listeners
@@ -643,6 +914,9 @@
         elements.themeToggle.addEventListener('click', toggleTheme);
         elements.languageToggle.addEventListener('click', toggleLanguage);
         elements.installBtn.addEventListener('click', installPWA);
+        elements.unitButtons.forEach(btn => {
+            btn.addEventListener('click', changeUnit);
+        });
 
         // Check for saved theme preference
         if (localStorage.getItem('darkMode') === 'true') {
@@ -655,6 +929,13 @@
             isEnglish = false;
             elements.languageToggle.textContent = 'BN';
             updateUIText();
+        }
+
+        // Check for saved unit preference
+        if (localStorage.getItem('unit') === 'imperial') {
+            currentUnit = 'imperial';
+            elements.unitButtons[0].classList.remove('active');
+            elements.unitButtons[1].classList.add('active');
         }
 
         // Load saved locations
@@ -671,74 +952,174 @@
         fetchWeather('Dhaka');
 
         // Functions
+        function showNotification(message, type = 'info', duration = 3000) {
+            const notification = elements.notification;
+            notification.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i> ${message}`;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        function setLoading(state) {
+            isLoading = state;
+            if (state) {
+                elements.searchBtn.innerHTML = '<div class="loading"></div>';
+                elements.locateBtn.innerHTML = '<div class="loading"></div>';
+            } else {
+                updateButtonText();
+            }
+        }
+
+        function updateButtonText() {
+            if (isEnglish) {
+                elements.searchText.textContent = 'Search';
+                elements.locateText.textContent = 'Current Location';
+            } else {
+                elements.searchText.textContent = 'খুঁজুন';
+                elements.locateText.textContent = 'বর্তমান অবস্থান';
+            }
+        }
+
         function searchLocation() {
+            if (isLoading) return;
+            
             const location = elements.locationInput.value.trim();
             if (location) {
                 fetchWeather(location);
+            } else {
+                showNotification(
+                    isEnglish ? 'Please enter a location' : 'অনুগ্রহ করে একটি অবস্থান লিখুন',
+                    'error'
+                );
             }
         }
 
         function getCurrentLocation() {
+            if (isLoading) return;
+            
             if (navigator.geolocation) {
+                setLoading(true);
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const { latitude, longitude } = position.coords;
                         fetchWeatherByCoords(latitude, longitude);
+                        setLoading(false);
                     },
                     (error) => {
-                        alert('Unable to retrieve your location. Please enable location services or search manually.');
+                        setLoading(false);
+                        showNotification(
+                            isEnglish 
+                                ? 'Unable to retrieve your location. Please enable location services or search manually.' 
+                                : 'আপনার অবস্থান পাওয়া যায়নি। অনুগ্রহ করে লোকেশন সার্ভিস চালু করুন বা ম্যানুয়ালি খুঁজুন।',
+                            'error'
+                        );
                         console.error('Geolocation error:', error);
                     }
                 );
             } else {
-                alert('Geolocation is not supported by your browser. Please search manually.');
+                showNotification(
+                    isEnglish 
+                        ? 'Geolocation is not supported by your browser. Please search manually.' 
+                        : 'আপনার ব্রাউজার দ্বারা লোকেশন সাপোর্ট করা হয় না। অনুগ্রহ করে ম্যানুয়ালি খুঁজুন।',
+                    'error'
+                );
             }
         }
 
         async function fetchWeather(location) {
             try {
+                setLoading(true);
                 // Show loading state
-                elements.location.textContent = 'Loading...';
+                elements.location.textContent = isEnglish ? 'Loading...' : 'লোড হচ্ছে...';
                 
-                // First get coordinates from location name
-                const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`);
+                // First get coordinates from location name using OpenStreetMap Nominatim
+                const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&addressdetails=1&limit=1`);
                 const geoData = await geoResponse.json();
                 
-                if (!geoData.results || geoData.results.length === 0) {
+                if (!geoData || geoData.length === 0) {
                     throw new Error('Location not found');
                 }
                 
-                const { latitude, longitude, name, admin1, country } = geoData.results[0];
-                currentLocation = { latitude, longitude, name, admin1, country };
+                const { lat: latitude, lon: longitude, display_name, address } = geoData[0];
+                
+                // Get detailed location information
+                let name = address.city || address.town || address.village || address.county || '';
+                let admin1 = address.state || '';
+                let country = address.country || '';
+                let subdistrict = address.suburb || address.neighbourhood || address.hamlet || '';
+                
+                // For Bangladesh, try to get upazila information
+                if (country === 'Bangladesh') {
+                    if (address.city_district) {
+                        subdistrict = address.city_district;
+                    } else if (address.district) {
+                        subdistrict = address.district;
+                    }
+                }
+                
+                currentLocation = { 
+                    latitude, 
+                    longitude, 
+                    name, 
+                    admin1, 
+                    country,
+                    subdistrict,
+                    display_name 
+                };
                 
                 // Now fetch weather data
                 await fetchWeatherByCoords(latitude, longitude, name);
                 
                 // Add to saved locations if not already there
-                const locationKey = `${name}, ${admin1}, ${country}`;
+                const locationKey = `${name}${subdistrict ? ', ' + subdistrict : ''}${admin1 ? ', ' + admin1 : ''}, ${country}`;
                 if (!savedLocations.some(loc => loc.key === locationKey)) {
                     savedLocations.unshift({
                         key: locationKey,
                         name,
                         admin1,
                         country,
+                        subdistrict,
                         latitude,
-                        longitude
+                        longitude,
+                        display_name
                     });
+                    
+                    // Keep only the last 5 saved locations
+                    if (savedLocations.length > 5) {
+                        savedLocations.pop();
+                    }
+                    
                     localStorage.setItem('savedLocations', JSON.stringify(savedLocations));
                     renderSavedLocations();
+                    
+                    showNotification(
+                        isEnglish 
+                            ? 'Location saved to your recent searches' 
+                            : 'অবস্থানটি আপনার সাম্প্রতিক অনুসন্ধানে সংরক্ষিত হয়েছে',
+                        'success'
+                    );
                 }
             } catch (error) {
                 console.error('Error fetching weather:', error);
-                alert('Failed to fetch weather data. Please try another location.');
+                showNotification(
+                    isEnglish 
+                        ? 'Failed to fetch weather data. Please try another location.' 
+                        : 'আবহাওয়ার তথ্য পাওয়া যায়নি। অনুগ্রহ করে অন্য অবস্থান চেষ্টা করুন।',
+                    'error'
+                );
                 elements.location.textContent = '--';
+            } finally {
+                setLoading(false);
             }
         }
 
         async function fetchWeatherByCoords(latitude, longitude, name = null) {
             try {
+                setLoading(true);
                 // Show loading state
-                elements.location.textContent = 'Loading...';
+                elements.location.textContent = isEnglish ? 'Loading...' : 'লোড হচ্ছে...';
                 
                 // Fetch weather data from Open-Meteo API
                 const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,weather_code,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,uv_index_max&timezone=auto`);
@@ -753,24 +1134,70 @@
                 
                 // Set background based on weather and time
                 setBackground(weatherData.current.weather_code, weatherData.current.is_day);
+                
+                // Show map
+                showMap(latitude, longitude);
+                
+                // Show notification
+                showNotification(
+                    isEnglish 
+                        ? 'Weather data updated successfully' 
+                        : 'আবহাওয়ার তথ্য সফলভাবে আপডেট হয়েছে',
+                    'success'
+                );
             } catch (error) {
                 console.error('Error fetching weather:', error);
-                alert('Failed to fetch weather data. Please try again.');
+                showNotification(
+                    isEnglish 
+                        ? 'Failed to fetch weather data. Please try again.' 
+                        : 'আবহাওয়ার তথ্য পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।',
+                    'error'
+                );
                 elements.location.textContent = '--';
+            } finally {
+                setLoading(false);
             }
+        }
+
+        function showMap(latitude, longitude) {
+            elements.mapContainer.style.display = 'block';
+            elements.mapIframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude-0.05}%2C${latitude-0.05}%2C${longitude+0.05}%2C${latitude+0.05}&layer=mapnik&marker=${latitude}%2C${longitude}`;
         }
 
         function displayWeatherData(weatherData, aqiData, customName = null) {
             // Current weather
             const current = weatherData.current;
             const locationName = customName || currentLocation.name;
-            const locationStr = `${locationName}, ${currentLocation.admin1 ? currentLocation.admin1 + ', ' : ''}${currentLocation.country}`;
+            let locationStr = locationName;
+            
+            // Add subdistrict (upazila) if available
+            if (currentLocation.subdistrict) {
+                locationStr += `, ${currentLocation.subdistrict}`;
+            }
+            
+            // Add admin1 (state/division) if available
+            if (currentLocation.admin1) {
+                locationStr += `, ${currentLocation.admin1}`;
+            }
+            
+            // Add country if available
+            if (currentLocation.country) {
+                locationStr += `, ${currentLocation.country}`;
+            }
             
             elements.location.textContent = locationStr;
-            elements.temperature.textContent = `${current.temperature_2m}°${weatherData.current_units.temperature_2m}`;
+            
+            // Update temperature based on selected unit
+            updateTemperatureDisplay(current.temperature_2m, current.apparent_temperature, weatherData.current_units.temperature_2m);
+            
             elements.weatherDescription.textContent = getWeatherDescription(current.weather_code, current.is_day);
+            
+            // Update humidity
             elements.humidity.textContent = `${current.relative_humidity_2m}${weatherData.current_units.relative_humidity_2m}`;
-            elements.wind.textContent = `${current.wind_speed_10m} ${weatherData.current_units.wind_speed_10m}`;
+            
+            // Update wind speed based on selected unit
+            updateWindDisplay(current.wind_speed_10m, weatherData.current_units.wind_speed_10m);
+            
             elements.windDirection.textContent = getWindDirection(current.wind_direction_10m);
             elements.precipitation.textContent = `${current.precipitation} ${weatherData.current_units.precipitation}`;
             
@@ -805,6 +1232,107 @@
             
             // Mood suggestions
             updateMoodSuggestions(current.weather_code, current.temperature_2m);
+            
+            // Update pollen information (simulated data)
+            updatePollenInfo();
+            
+            // Update air pollutants information
+            updateAirPollutants(aqiData.current);
+        }
+
+        function updateTemperatureDisplay(temp, feelsLike, unit) {
+            if (currentUnit === 'imperial') {
+                // Convert Celsius to Fahrenheit
+                const tempF = (temp * 9/5) + 32;
+                const feelsLikeF = (feelsLike * 9/5) + 32;
+                elements.temperature.textContent = `${tempF.toFixed(1)}°F`;
+                elements.feelsLike.textContent = `${isEnglish ? 'Feels like' : 'অনুভূত হচ্ছে'} ${feelsLikeF.toFixed(1)}°F`;
+            } else {
+                elements.temperature.textContent = `${temp}°${unit}`;
+                elements.feelsLike.textContent = `${isEnglish ? 'Feels like' : 'অনুভূত হচ্ছে'} ${feelsLike}°${unit}`;
+            }
+        }
+
+        function updateWindDisplay(windSpeed, unit) {
+            if (currentUnit === 'imperial') {
+                // Convert km/h to mph
+                const windMph = windSpeed * 0.621371;
+                elements.wind.textContent = `${windMph.toFixed(1)} mph`;
+            } else {
+                elements.wind.textContent = `${windSpeed} ${unit}`;
+            }
+        }
+
+        function updatePollenInfo() {
+            // Simulate pollen data (in a real app, this would come from an API)
+            const treePollen = Math.floor(Math.random() * 10);
+            const grassPollen = Math.floor(Math.random() * 10);
+            const weedPollen = Math.floor(Math.random() * 10);
+            
+            const pollenItems = elements.pollenInfo.querySelectorAll('.pollen-item');
+            
+            // Tree pollen
+            pollenItems[0].querySelector('.pollen-value').textContent = getPollenLevel(treePollen);
+            pollenItems[0].querySelector('.pollen-value').className = `pollen-value pollen-${getPollenClass(treePollen)}`;
+            
+            // Grass pollen
+            pollenItems[1].querySelector('.pollen-value').textContent = getPollenLevel(grassPollen);
+            pollenItems[1].querySelector('.pollen-value').className = `pollen-value pollen-${getPollenClass(grassPollen)}`;
+            
+            // Weed pollen
+            pollenItems[2].querySelector('.pollen-value').textContent = getPollenLevel(weedPollen);
+            pollenItems[2].querySelector('.pollen-value').className = `pollen-value pollen-${getPollenClass(weedPollen)}`;
+            
+            elements.pollenInfo.style.display = 'flex';
+        }
+
+        function getPollenLevel(value) {
+            if (value <= 2) return isEnglish ? 'Low' : 'নিম্ন';
+            if (value <= 5) return isEnglish ? 'Moderate' : 'মাঝারি';
+            if (value <= 8) return isEnglish ? 'High' : 'উচ্চ';
+            return isEnglish ? 'Very High' : 'অত্যধিক';
+        }
+
+        function getPollenClass(value) {
+            if (value <= 2) return 'low';
+            if (value <= 5) return 'moderate';
+            if (value <= 8) return 'high';
+            return 'high';
+        }
+
+        function updateAirPollutants(currentAqi) {
+            // Create a container for pollutants if it doesn't exist
+            let pollutantsContainer = document.getElementById('pollutants-container');
+            if (!pollutantsContainer) {
+                pollutantsContainer = document.createElement('div');
+                pollutantsContainer.id = 'pollutants-container';
+                pollutantsContainer.className = 'air-pollutants';
+                document.querySelector('.weather-card h2').insertAdjacentElement('afterend', pollutantsContainer);
+            }
+            
+            pollutantsContainer.innerHTML = '';
+            
+            // Add each pollutant
+            const pollutants = [
+                { name: 'PM2.5', value: currentAqi.pm2_5, unit: 'µg/m³', icon: 'smog' },
+                { name: 'PM10', value: currentAqi.pm10, unit: 'µg/m³', icon: 'smog' },
+                { name: 'NO₂', value: currentAqi.nitrogen_dioxide, unit: 'µg/m³', icon: 'industry' },
+                { name: 'SO₂', value: currentAqi.sulphur_dioxide, unit: 'µg/m³', icon: 'industry' },
+                { name: 'CO', value: currentAqi.carbon_monoxide, unit: 'mg/m³', icon: 'smoke' },
+                { name: 'O₃', value: currentAqi.ozone, unit: 'µg/m³', icon: 'sun' }
+            ];
+            
+            pollutants.forEach(pollutant => {
+                if (pollutant.value) {
+                    const pollutantItem = document.createElement('div');
+                    pollutantItem.className = 'pollutant-item';
+                    pollutantItem.innerHTML = `
+                        <div><i class="fas fa-${pollutant.icon}"></i> ${pollutant.name}</div>
+                        <div class="pollutant-value">${pollutant.value.toFixed(1)} ${pollutant.unit}</div>
+                    `;
+                    pollutantsContainer.appendChild(pollutantItem);
+                }
+            });
         }
 
         function renderHourlyForecast(weatherData) {
@@ -826,12 +1354,19 @@
                     isDay: weatherData.hourly.is_day[hourIndex]
                 };
                 
+                // Convert temperature if needed
+                let displayTemp = hourData.temp;
+                if (currentUnit === 'imperial') {
+                    displayTemp = (hourData.temp * 9/5) + 32;
+                    displayTemp = displayTemp.toFixed(1);
+                }
+                
                 const hourCard = document.createElement('div');
                 hourCard.className = 'hour-card';
                 hourCard.innerHTML = `
                     <div>${hourData.time.getHours().toString().padStart(2, '0')}:00</div>
                     <div class="weather-icon-small">${getWeatherIcon(hourData.weatherCode, hourData.isDay)}</div>
-                    <div>${hourData.temp}°</div>
+                    <div>${displayTemp}°</div>
                     <div><i class="fas fa-tint"></i> ${hourData.precipitation}%</div>
                 `;
                 
@@ -854,6 +1389,16 @@
                     precipitation: weatherData.daily.precipitation_probability_max[i]
                 };
                 
+                // Convert temperatures if needed
+                let displayMaxTemp = dayData.maxTemp;
+                let displayMinTemp = dayData.minTemp;
+                if (currentUnit === 'imperial') {
+                    displayMaxTemp = (dayData.maxTemp * 9/5) + 32;
+                    displayMinTemp = (dayData.minTemp * 9/5) + 32;
+                    displayMaxTemp = displayMaxTemp.toFixed(1);
+                    displayMinTemp = displayMinTemp.toFixed(1);
+                }
+                
                 const dayName = dayData.date.toLocaleDateString(isEnglish ? 'en-US' : 'bn-BD', { weekday: 'short' });
                 const dateStr = dayData.date.getDate();
                 
@@ -863,7 +1408,7 @@
                     <div>${isEnglish ? dayName : convertToBanglaDay(dayName)}</div>
                     <div>${isEnglish ? dateStr : convertToBanglaNumber(dateStr)}</div>
                     <div class="weather-icon-small">${getWeatherIcon(dayData.weatherCode, true)}</div>
-                    <div>${dayData.maxTemp}° / ${dayData.minTemp}°</div>
+                    <div>${displayMaxTemp}° / ${displayMinTemp}°</div>
                     <div><i class="fas fa-tint"></i> ${dayData.precipitation}%</div>
                 `;
                 
@@ -887,7 +1432,14 @@
                 if (hourIndex >= weatherData.hourly.time.length) break;
                 
                 hours.push(new Date(weatherData.hourly.time[hourIndex]).getHours().toString().padStart(2, '0') + ':00');
-                temps.push(weatherData.hourly.temperature_2m[hourIndex]);
+                
+                // Convert temperature if needed
+                let temp = weatherData.hourly.temperature_2m[hourIndex];
+                if (currentUnit === 'imperial') {
+                    temp = (temp * 9/5) + 32;
+                }
+                temps.push(temp);
+                
                 precipitations.push(weatherData.hourly.precipitation_probability[hourIndex]);
             }
             
@@ -903,7 +1455,7 @@
                     labels: hours,
                     datasets: [
                         {
-                            label: 'Temperature (°C)',
+                            label: isEnglish ? `Temperature (°${currentUnit === 'metric' ? 'C' : 'F'})` : `তাপমাত্রা (°${currentUnit === 'metric' ? 'C' : 'F'})`,
                             data: temps,
                             borderColor: 'rgba(255, 99, 132, 1)',
                             backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -911,7 +1463,7 @@
                             yAxisID: 'y'
                         },
                         {
-                            label: 'Precipitation (%)',
+                            label: isEnglish ? 'Precipitation (%)' : 'বৃষ্টিপাত (%)',
                             data: precipitations,
                             borderColor: 'rgba(54, 162, 235, 1)',
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -931,7 +1483,7 @@
                             position: 'left',
                             title: {
                                 display: true,
-                                text: 'Temperature (°C)'
+                                text: isEnglish ? `Temperature (°${currentUnit === 'metric' ? 'C' : 'F'})` : `তাপমাত্রা (°${currentUnit === 'metric' ? 'C' : 'F'})`
                             }
                         },
                         y1: {
@@ -942,7 +1494,7 @@
                             min: 0,
                             title: {
                                 display: true,
-                                text: 'Precipitation (%)'
+                                text: isEnglish ? 'Precipitation (%)' : 'বৃষ্টিপাত (%)'
                             },
                             grid: {
                                 drawOnChartArea: false
@@ -1060,10 +1612,16 @@
                 recommendations += isEnglish 
                     ? `<p><i class="fas fa-window-close"></i> Keep windows closed to prevent polluted air from entering.</p>` 
                     : `<p><i class="fas fa-window-close"></i> দূষিত বাতাস ঢুকতে দেবেন না, জানালা বন্ধ রাখুন।</p>`;
+                recommendations += isEnglish 
+                    ? `<p><i class="fas fa-air-freshener"></i> Use an air purifier if available.</p>` 
+                    : `<p><i class="fas fa-air-freshener"></i> সম্ভব হলে এয়ার পিউরিফায়ার ব্যবহার করুন।</p>`;
             } else {
                 recommendations += isEnglish 
                     ? `<p><i class="fas fa-tree"></i> Air quality is good. Great time for outdoor activities.</p>` 
                     : `<p><i class="fas fa-tree"></i> বাতাসের মান ভালো। বাইরে বের হওয়ার জন্য ভালো সময়।</p>`;
+                recommendations += isEnglish 
+                    ? `<p><i class="fas fa-window-open"></i> Open windows to ventilate your home.</p>` 
+                    : `<p><i class="fas fa-window-open"></i> ঘর বায়ুচলাচলের জন্য জানালা খুলুন।</p>`;
             }
             
             elements.healthRecommendations.innerHTML = recommendations;
@@ -1077,14 +1635,23 @@
                 skinTips += isEnglish 
                     ? `<p><i class="fas fa-umbrella-beach"></i> Seek shade between 10am-4pm when UV is strongest.</p>` 
                     : `<p><i class="fas fa-umbrella-beach"></i> সকাল ১০টা থেকে বিকাল ৪টা পর্যন্ত ছায়ায় থাকুন যখন UV সবচেয়ে শক্তিশালী।</p>`;
+                skinTips += isEnglish 
+                    ? `<p><i class="fas fa-hat-cowboy"></i> Wear a wide-brimmed hat and UV-blocking sunglasses.</p>` 
+                    : `<p><i class="fas fa-hat-cowboy"></i> চওড়া কিনারাযুক্ত টুপি এবং UV ব্লকিং সানগ্লাস পরুন।</p>`;
             } else if (uvIndex >= 3) {
                 skinTips += isEnglish 
                     ? `<p><i class="fas fa-sun"></i> Apply SPF 15+ sunscreen if you'll be outside for more than 30 minutes.</p>` 
                     : `<p><i class="fas fa-sun"></i> ৩০ মিনিটের বেশি বাইরে থাকলে SPF ১৫+ সানস্ক্রিন ব্যবহার করুন।</p>`;
+                skinTips += isEnglish 
+                    ? `<p><i class="fas fa-cloud-sun"></i> UV rays can penetrate clouds, so protection is still needed on cloudy days.</p>` 
+                    : `<p><i class="fas fa-cloud-sun"></i> UV রে মেঘ ভেদ করতে পারে, তাই মেঘলা দিনেও সুরক্ষা প্রয়োজন।</p>`;
             } else {
                 skinTips += isEnglish 
                     ? `<p><i class="fas fa-smile"></i> UV index is low. No special protection needed.</p>` 
                     : `<p><i class="fas fa-smile"></i> UV সূচক কম। বিশেষ সুরক্ষার প্রয়োজন নেই।</p>`;
+                skinTips += isEnglish 
+                    ? `<p><i class="fas fa-moisture"></i> Keep your skin moisturized in any weather.</p>` 
+                    : `<p><i class="fas fa-moisture"></i> যেকোনো আবহাওয়ায় আপনার ত্বক ময়েশ্চারাইজড রাখুন।</p>`;
             }
             
             elements.skinCareTips.innerHTML = skinTips;
@@ -1137,11 +1704,31 @@
                     : "আপনার দিনটি ভালো কাটুক! আবহাওয়ার আপডেটের জন্য চেক করুন।";
             }
             
+            // Add temperature-based suggestions
+            if (temperature > 30) {
+                suggestions += isEnglish 
+                    ? "<p><i class='fas fa-glass-water'></i> Stay hydrated in this heat!</p>" 
+                    : "<p><i class='fas fa-glass-water'></i> এই গরমে হাইড্রেটেড থাকুন!</p>";
+            } else if (temperature < 10) {
+                suggestions += isEnglish 
+                    ? "<p><i class='fas fa-mug-hot'></i> Warm up with hot drinks and layered clothing.</p>" 
+                    : "<p><i class='fas fa-mug-hot'></i> গরম পানীয় এবং স্তরিত পোশাক দিয়ে গরম থাকুন।</p>";
+            }
+            
             elements.moodSuggestions.innerHTML = `<p>${suggestions}</p>`;
         }
 
         function renderSavedLocations() {
             elements.savedCities.innerHTML = '';
+            
+            if (savedLocations.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.textContent = isEnglish 
+                    ? 'No saved locations. Search for a location to save it here.' 
+                    : 'কোন সংরক্ষিত অবস্থান নেই। একটি অবস্থান খুঁজে এখানে সংরক্ষণ করুন।';
+                elements.savedCities.appendChild(emptyMsg);
+                return;
+            }
             
             savedLocations.forEach(location => {
                 const cityChip = document.createElement('div');
@@ -1169,6 +1756,13 @@
             savedLocations = savedLocations.filter(loc => loc.key !== locationKey);
             localStorage.setItem('savedLocations', JSON.stringify(savedLocations));
             renderSavedLocations();
+            
+            showNotification(
+                isEnglish 
+                    ? 'Location removed from saved list' 
+                    : 'অবস্থানটি সংরক্ষিত তালিকা থেকে সরানো হয়েছে',
+                'success'
+            );
         }
 
         function switchTab(e) {
@@ -1215,24 +1809,59 @@
             }
         }
 
+        function changeUnit(e) {
+            const unit = e.target.dataset.unit;
+            if (unit === currentUnit) return;
+            
+            currentUnit = unit;
+            localStorage.setItem('unit', unit);
+            
+            // Update active unit button
+            elements.unitButtons.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            // Refresh weather data to update units
+            if (currentLocation) {
+                fetchWeatherByCoords(currentLocation.latitude, currentLocation.longitude, currentLocation.name);
+            }
+        }
+
         function updateUIText() {
             elements.appTitle.textContent = isEnglish ? 'Weather & Air Quality Checker' : 'আবহাওয়া ও বায়ুর মান পরীক্ষক';
             elements.locationInput.placeholder = isEnglish ? 'Enter city name or zip code' : 'শহরের নাম বা পোস্ট কোড লিখুন';
-            elements.searchBtn.innerHTML = isEnglish ? '<i class="fas fa-search"></i> Search' : '<i class="fas fa-search"></i> খুঁজুন';
-            elements.locateBtn.innerHTML = isEnglish ? '<i class="fas fa-location-arrow"></i> Current Location' : '<i class="fas fa-location-arrow"></i> বর্তমান অবস্থান';
+            updateButtonText();
+            
             elements.forecastTitle.textContent = isEnglish ? 'Hourly Forecast' : 'প্রতি ঘন্টার পূর্বাভাস';
+            elements.savedLocationsTitle.textContent = isEnglish ? 'Saved Locations' : 'সংরক্ষিত অবস্থানসমূহ';
+            elements.airQualityTitle.textContent = isEnglish ? 'Air Quality' : 'বায়ুর মান';
+            elements.healthTitle.textContent = isEnglish ? 'Health Recommendations' : 'স্বাস্থ্য পরামর্শ';
+            elements.skinTitle.textContent = isEnglish ? 'Skin Care Tips' : 'ত্বকের যত্ন পরামর্শ';
+            elements.moodTitle.textContent = isEnglish ? 'Mood Suggestions' : 'মুড সাজেশন';
+            elements.unitText.textContent = isEnglish ? 'Units:' : 'একক:';
+            elements.humidityLabel.textContent = isEnglish ? 'Humidity' : 'আর্দ্রতা';
+            elements.windLabel.textContent = isEnglish ? 'Wind' : 'বাতাস';
+            elements.windDirectionLabel.textContent = isEnglish ? 'Wind Direction' : 'বাতাসের দিক';
+            elements.precipitationLabel.textContent = isEnglish ? 'Precipitation' : 'বৃষ্টিপাত';
+            elements.aqiLabel.textContent = isEnglish ? 'Air Quality Index' : 'বায়ুর মান সূচক';
+            elements.uvLabel.textContent = isEnglish ? 'UV Index' : 'UV সূচক';
+            elements.visibilityLabel.textContent = isEnglish ? 'Visibility' : 'দৃশ্যমানতা';
+            elements.sunTimesLabel.textContent = isEnglish ? 'Sunrise/Sunset' : 'সূর্যোদয়/সূর্যাস্ত';
             
             // Update tab text
-            elements.tabs[0].textContent = isEnglish ? 'Hourly' : 'প্রতি ঘন্টা';
-            elements.tabs[1].textContent = isEnglish ? 'Daily' : 'দৈনিক';
+            elements.hourlyTab.textContent = isEnglish ? 'Hourly' : 'প্রতি ঘন্টা';
+            elements.dailyTab.textContent = isEnglish ? 'Daily' : 'দৈনিক';
             
-            // Update saved locations title
-            document.querySelector('.saved-cities-container h2').textContent = isEnglish ? 'Saved Locations' : 'সংরক্ষিত অবস্থানসমূহ';
+            // Update unit buttons
+            elements.unitButtons[0].textContent = isEnglish ? '°C, km/h' : '°C, কিমি/ঘন্টা';
+            elements.unitButtons[1].textContent = isEnglish ? '°F, mph' : '°F, মাইল/ঘন্টা';
             
-            // Update additional info titles
-            document.querySelectorAll('.info-card h3')[0].textContent = isEnglish ? 'Health Recommendations' : 'স্বাস্থ্য পরামর্শ';
-            document.querySelectorAll('.info-card h3')[1].textContent = isEnglish ? 'Skin Care Tips' : 'ত্বকের যত্ন পরামর্শ';
-            document.querySelectorAll('.info-card h3')[2].textContent = isEnglish ? 'Mood Suggestions' : 'মুড সাজেশন';
+            // Update feels like text if data is loaded
+            if (currentLocation) {
+                const feelsLikeText = elements.feelsLike.textContent;
+                if (feelsLikeText.includes('Feels like')) {
+                    elements.feelsLike.textContent = feelsLikeText.replace('Feels like', isEnglish ? 'Feels like' : 'অনুভূত হচ্ছে');
+                }
+            }
         }
 
         function setWeatherIcon(weatherCode, isDay) {
